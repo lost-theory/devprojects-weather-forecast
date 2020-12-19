@@ -1,4 +1,5 @@
 import React from 'react';
+import { Line } from 'react-chartjs-2';
 import './App.css';
 
 const OPEN_WEATHER_MAP_API_KEY = "fae58d081df939c92e507d70ab7e8a90";
@@ -20,9 +21,7 @@ class WeatherForecastApp extends React.Component {
                 windSpeed: undefined,
                 humidity: undefined,
             },
-            forecastData: {
-                daily: undefined,
-            },
+            forecastData: [],
         };
     }
 
@@ -48,11 +47,21 @@ class WeatherForecastApp extends React.Component {
     }
 
     handleForecastApiResponse = (res) => {
-        var forecastData = {};
+        var forecastData = [];
         if(res.daily) {
-            forecastData = {
-                daily: res.daily,
-            };
+            var day, temp, humid, condition;
+            for(var i=0; i < FORECAST_DAYS; i++) {
+                if(i === 0) {
+                    day = "Today";
+                } else {
+                    day = new Date(res.daily[i].dt * 1000).toDateString().split(' ');
+                    day = day[1] + " " + day[2];
+                }
+                temp = parseInt(res.daily[i].temp.day);
+                humid = res.daily[i].humidity;
+                condition = res.daily[i].weather[0].main;
+                forecastData.push({day: day, temp: temp, humid: humid, condition: condition});
+            }
         }
         this.setState({forecastData: forecastData});
     }
@@ -121,9 +130,24 @@ class CurrentConditions extends React.Component {
 
 class TemperatureGraph extends React.Component {
     render() {
+        var labels = [];
+        this.props.forecastData.forEach((x) => { labels.push(x.day); });
+        var points = [];
+        this.props.forecastData.forEach((x) => { points.push(x.temp); });
+        const data = {
+            labels: labels,
+            datasets: [{label: "Temperature", data: points, fill: false, borderColor: "rgb(75, 192, 192)", lineTension: 0.5}]
+        };
+        const options = {
+            legend: {display: false},
+            scales: {yAxes: [{offset: true}], xAxes: [{display: false}]},
+        };
         return (
             <div id="TemperatureGraph">
                 {this.props.weatherData.temp || '--'}&deg;F
+                <div className="graphContainer">
+                    <Line data={data} options={options} />
+                </div>
             </div>
         );
     }
@@ -131,22 +155,13 @@ class TemperatureGraph extends React.Component {
 
 class Forecast extends React.Component {
     render() {
-        if(!this.props.forecastData.daily) {
+        if(this.props.forecastData.length === 0) {
             return <div id="Forecast"><p>--</p></div>;
         }
+        var data = this.props.forecastData;
         var days = [];
-        var day, temp, humid, condition;
         for(var i=0; i < FORECAST_DAYS; i++) {
-            if(i === 0) {
-                day = "Today";
-            } else {
-                day = new Date(this.props.forecastData.daily[i].dt * 1000).toDateString().split(' ');
-                day = day[1] + " " + day[2];
-            }
-            temp = parseInt(this.props.forecastData.daily[i].temp.day);
-            humid = this.props.forecastData.daily[i].humidity;
-            condition = this.props.forecastData.daily[i].weather[0].main;
-            days.push(<p key={day}>{day}, {condition}, {temp}&deg;F, Humidity {humid}%</p>);
+            days.push(<p key={data[i].day}>{data[i].day}, {data[i].condition}, {data[i].temp}&deg;F, Humidity {data[i].humid}%</p>);
         }
         return (
             <div id="Forecast">
