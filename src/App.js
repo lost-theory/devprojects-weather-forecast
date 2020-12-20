@@ -7,6 +7,25 @@ const OPEN_WEATHER_MAP_WEATHER_URL = "https://api.openweathermap.org/data/2.5/we
 const OPEN_WEATHER_MAP_FORECAST_URL = "https://api.openweathermap.org/data/2.5/onecall?units=imperial&appid=" + OPEN_WEATHER_MAP_API_KEY + "&";
 const FORECAST_DAYS = 4;
 
+const WEATHER_CONDITION_TO_EMOJI = {
+    "Snow": "❄️",
+    "Clouds": "☁️",
+    "Thunderstorm": "⛈️",
+    "Drizzle": "🌧️",
+    "Rain": "🌧️",
+    "Mist": "🌫️",
+    "Haze": "🌫️",
+    "Fog": "🌫️",
+    "Dust": "🌫️",
+    "Sand": "🌫️",
+    "Smoke": "🔥",
+    "Ash": "🌋",
+    "Squall": "💨",
+    "Tornado": "🌪️",
+    "Clear": "☀️",
+    "Meteor Strike Imminent": "☄️",
+};
+
 function App() {
     return <WeatherForecastApp />;
 }
@@ -109,7 +128,7 @@ class CityInput extends React.Component {
     render() {
         return (
             <div id="CityInput">
-                <label htmlFor="city">Your city</label>
+                <label htmlFor="city">City</label>
                 <input name="city" id="city" onChange={this.cityChanged} />
             </div>
         );
@@ -118,11 +137,14 @@ class CityInput extends React.Component {
 
 class CurrentConditions extends React.Component {
     render() {
+        var conditionIcon = WEATHER_CONDITION_TO_EMOJI[this.props.weatherData.condition] || "🤔";
         return (
             <div id="CurrentConditions">
-                <p>{this.props.currentTime}</p>
-                <p>{this.props.weatherData.condition || '--'}, {this.props.weatherData.temp || '--'}&deg;F</p>
-                <p>{this.props.weatherData.humidity || '--'}% humidity, {this.props.weatherData.windSpeed || '--'}mph wind speed</p>
+                <p className="time">{this.props.currentTime}</p>
+                <p className="condIcon">{conditionIcon || '--'}</p>
+                <p className="condTitle">{this.props.weatherData.condition || '--'}</p>
+                <p className="temp">{this.props.weatherData.temp || '--'}&deg;F</p>
+                <p className="humid">{this.props.weatherData.humidity || '--'}% humidity, {this.props.weatherData.windSpeed || '--'}mph wind speed</p>
             </div>
         );
     }
@@ -144,7 +166,6 @@ class TemperatureGraph extends React.Component {
         };
         return (
             <div id="TemperatureGraph">
-                {this.props.weatherData.temp || '--'}&deg;F
                 <div className="graphContainer">
                     <Line data={data} options={options} />
                 </div>
@@ -155,13 +176,25 @@ class TemperatureGraph extends React.Component {
 
 class Forecast extends React.Component {
     render() {
-        if(this.props.forecastData.length === 0) {
-            return <div id="Forecast"><p>--</p></div>;
-        }
         var data = this.props.forecastData;
         var days = [];
+        var conditionIcon;
         for(var i=0; i < FORECAST_DAYS; i++) {
-            days.push(<p key={data[i].day}>{data[i].day}, {data[i].condition}, {data[i].temp}&deg;F, Humidity {data[i].humid}%</p>);
+            if(!data[i]) {
+                days.push(<div className="day" key={i}>
+                    <p className="dayName">--</p>
+                </div>);
+                continue;
+            }
+            conditionIcon = WEATHER_CONDITION_TO_EMOJI[data[i].condition] || "🤔";
+            days.push(<div className={"day " + (data[i].day === 'Today' ? 'today' : '')} key={data[i].day}>
+                <p className="dayName">{data[i].day}</p>
+                <p className="condIcon">{conditionIcon}</p>
+                <p className="condTitle">{data[i].condition}</p>
+                <p className="temp">{data[i].temp}&deg;F</p>
+                <p className="humidTitle">Humidity</p>
+                <p className="humid">{data[i].humid}%</p>
+            </div>);
         }
         return (
             <div id="Forecast">

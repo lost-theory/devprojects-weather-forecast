@@ -1,1 +1,21 @@
-.graphContainer { width: 500px; height: 200px; }
+body { background: #eff5f9; }
+#App { background: #e6edf2; margin: 25px; padding: 10px; width: 500px; border: 3px solid #ccd9e2; border-radius: 10px; }
+
+#CityInput { margin: 12px 0px 18px 0px; }
+#CityInput label { padding-right: 6px; }
+
+#CurrentConditions { text-align: center; margin: 0px 0px 24px 0px; }
+#CurrentConditions p { margin: 0; padding: 0; }
+#CurrentConditions .time { font-size: 1.5em; margin: 0.2em 0 0 0; }
+#CurrentConditions .condIcon { font-size: 5em; margin: 0.2em 0 0 0; }
+#CurrentConditions .condTitle { font-size: 0.8em; margin-bottom: 1em; }
+
+#TemperatureGraph .graphContainer { width: 500px; }
+
+#Forecast { width: 500px; display: flex; background: #add; padding-left: 2px; }
+#Forecast .day { background: #eff; text-align: center; flex-grow: 1; margin: 2px 2px 2px 0px; padding: 10px 0px; }
+#Forecast .today { background: #cee; }
+#Forecast .day p { margin: 0; padding: 0; }
+#Forecast .day .condIcon { font-size: 5em; margin: 0.2em 0 0 0; }
+#Forecast .day .condTitle { font-size: 0.8em; margin-bottom: 1em; }
+#Forecast .day .humidTitle { font-size: 0.8em; margin-top: 1em; }
