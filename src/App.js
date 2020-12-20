@@ -97,7 +97,6 @@ class WeatherForecastApp extends React.Component {
                     weatherData={this.state.weatherData}
                 />
                 <TemperatureGraph
-                    weatherData={this.state.weatherData}
                     forecastData={this.state.forecastData}
                 />
                 <Forecast
